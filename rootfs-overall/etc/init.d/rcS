@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Set mdev
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+/sbin/mdev -s && echo "mdev is ok......"
+
+# create console and null node for nfsroot
+#mknod -m 600 /dev/console c 5 1
+#mknod -m 666 /dev/null c 1 3
+
+# Set Global Environment
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export PATH=/app/bin:$PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/sdcard/lib:/app/lib
+
+# networking
+ifconfig lo up
+#ifconfig eth0 192.168.1.80
+
+# Start telnet daemon
+telnetd &
+
+# Set the system time from the hardware clock
+hwclock -s
+
+# Mount system partition
+#mount -t squashfs /dev/mtdblock3 /app
+#mount -t jffs2 -o sync /dev/mtdblock4 /conf
+
+#mkdir -p bin init etc/sensor lib/firmware lib/modules
+
+MODULE_DIR=$(uname -r)
+mkdir -p /tmp/modules/${MODULE_DIR}
+
+# Run init script
+#if [ -f /app/init/app_init.sh ]; then
+#    /app/init/app_init.sh &
+#fi
